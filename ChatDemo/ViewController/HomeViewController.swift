@@ -83,11 +83,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         viewModel.downloadImage(imageUrl: typicodeItem.thumbnailURL) { result in
             switch result {
                 case .success(let image):
-                    DispatchQueue.main.async { [weak self] in
-                        cell.iconImageView.image = image
-
-                        self?.displayTableView.reloadRows(at: [IndexPath(row: indexPath.row, section: indexPath.section)], with: .none)
-                    }
+                    cell.iconImageView.image = image
                 case .failure(let error):
                     print("will - downloadImage error: \(error)")
             }

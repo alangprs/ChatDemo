@@ -28,9 +28,6 @@ class HomeTableViewCell: UITableViewCell {
 
     private func setupUI() {
 
-        iconImageView.image = UIImage(systemName: "photo")
-        idLabel.text = "1"
-        titleLabel.text = "55688"
         contentView.addSubview(iconImageView)
         contentView.addSubview(idLabel)
         contentView.addSubview(titleLabel)
