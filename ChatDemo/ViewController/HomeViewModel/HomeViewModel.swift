@@ -5,7 +5,7 @@
 //  Created by cm0768 on 2023/2/22.
 //
 
-import Foundation
+import UIKit
 
 class HomeViewModel {
 
@@ -13,6 +13,7 @@ class HomeViewModel {
         return GetTypicodeDataUseCase()
     }()
 
+    /// api 拉回來原始資料
     private(set) var typicodeList: [TypicodeStruct] = []
 
     func configure(indexPath: IndexPath) -> TypicodeStruct {
@@ -27,8 +28,21 @@ class HomeViewModel {
                     self?.typicodeList = success
                     completion(.success(Void()))
                 case .failure(let failure):
-                    print("will - error: \(failure)")
                     completion(.failure(failure))
+            }
+        }
+    }
+
+    func downloadImage(imageUrl path: String, completion: @escaping ((Result<UIImage, Error>) -> Void)) {
+        let downloadImageUseCase = DownloadImageUseCase(path: path)
+
+        downloadImageUseCase.downloadImage { result in
+            switch result {
+                case .success(let success):
+                    guard let imageItem = success else { return }
+                    completion(.success(imageItem))
+                case .failure(let error):
+                    completion(.failure(error))
             }
         }
     }

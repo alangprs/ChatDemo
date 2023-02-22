@@ -52,11 +52,11 @@ class HomeViewController: UIViewController {
         viewModel.getNetworkItem {[weak self] result in
             switch result {
                 case .success(_):
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async { [weak self] in
                         self?.displayTableView.reloadData()
                     }
-                case .failure(_):
-                    break
+                case .failure(let error):
+                    print("will - error: \(error)")
             }
         }
     }
@@ -76,9 +76,22 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
 
-        var typicodeItem = viewModel.configure(indexPath: indexPath)
+        let typicodeItem = viewModel.configure(indexPath: indexPath)
         cell.idLabel.text = "\(typicodeItem.id)"
         cell.titleLabel.text = typicodeItem.title
+
+        viewModel.downloadImage(imageUrl: typicodeItem.thumbnailURL) { result in
+            switch result {
+                case .success(let image):
+                    DispatchQueue.main.async { [weak self] in
+                        cell.iconImageView.image = image
+
+                        self?.displayTableView.reloadRows(at: [IndexPath(row: indexPath.row, section: indexPath.section)], with: .none)
+                    }
+                case .failure(let error):
+                    print("will - downloadImage error: \(error)")
+            }
+        }
 
         return cell
     }
