@@ -13,14 +13,22 @@ class HomeViewModel {
         return GetTypicodeDataUseCase()
     }()
 
-    func getNetworkItem() {
-        getTypicodeDataUseCase.getNetwork { result in
+    private(set) var typicodeList: [TypicodeStruct] = []
+
+    func configure(indexPath: IndexPath) -> TypicodeStruct {
+        return typicodeList[indexPath.row]
+    }
+
+    func getNetworkItem(completion: @escaping ((Result<Void, Error>) -> Void)) {
+        getTypicodeDataUseCase.getNetwork {[weak self] result in
 
             switch result {
                 case .success(let success):
-                    print("will - data: \(success)")
+                    self?.typicodeList = success
+                    completion(.success(Void()))
                 case .failure(let failure):
                     print("will - error: \(failure)")
+                    completion(.failure(failure))
             }
         }
     }

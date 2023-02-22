@@ -49,7 +49,16 @@ class HomeViewController: UIViewController {
     }
 
     private func getNetworkItem() {
-        viewModel.getNetworkItem()
+        viewModel.getNetworkItem {[weak self] result in
+            switch result {
+                case .success(_):
+                    DispatchQueue.main.async {
+                        self?.displayTableView.reloadData()
+                    }
+                case .failure(_):
+                    break
+            }
+        }
     }
 }
 
@@ -57,7 +66,7 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return viewModel.typicodeList.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -66,6 +75,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             print("will - get cell error")
             return UITableViewCell()
         }
+
+        var typicodeItem = viewModel.configure(indexPath: indexPath)
+        cell.idLabel.text = "\(typicodeItem.id)"
+        cell.titleLabel.text = typicodeItem.title
 
         return cell
     }
