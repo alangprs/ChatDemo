@@ -22,6 +22,13 @@ class HomeViewController: UIViewController {
         return tableView
     }()
 
+    /// 刷新
+    private lazy var refreshControl: UIRefreshControl = {
+        var refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didReRefresh), for: .allEvents)
+        return refreshControl
+    }()
+
     // MARK: - 生命週期
 
     override func viewDidLoad() {
@@ -46,6 +53,7 @@ class HomeViewController: UIViewController {
             make.top.bottom.leading.trailing.equalToSuperview()
         }
         displayTableView.register(HomeTableViewCell.self, forCellReuseIdentifier: "\(HomeTableViewCell.self)")
+        displayTableView.addSubview(refreshControl)
     }
 
     private func getNetworkItem() {
@@ -57,6 +65,27 @@ class HomeViewController: UIViewController {
                     }
                 case .failure(let error):
                     print("will - error: \(error)")
+            }
+        }
+    }
+
+    private func endRefreshing() {
+        DispatchQueue.main.async { [weak self] in
+            self?.displayTableView.reloadData()
+            self?.refreshControl.endRefreshing()
+        }
+    }
+
+    @objc private func didReRefresh() {
+        viewModel.configurePage()
+
+        viewModel.getNetworkItem { result in
+            switch result {
+                case .success(_):
+                    self.endRefreshing()
+                case .failure(let error):
+                    self.endRefreshing()
+                    print("will - refresh error: \(error)")
             }
         }
     }
@@ -83,7 +112,9 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         viewModel.downloadImage(imageUrl: typicodeItem.thumbnailURL) { result in
             switch result {
                 case .success(let image):
-                    cell.iconImageView.image = image
+                    DispatchQueue.main.async {
+                        cell.iconImageView.image = image
+                    }
                 case .failure(let error):
                     print("will - downloadImage error: \(error)")
             }
@@ -91,6 +122,5 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 
         return cell
     }
-
 
 }

@@ -9,11 +9,19 @@ import Foundation
 
 class GetTypicodeDataUseCase {
 
-    private var path: String = "https://jsonplaceholder.typicode.com/albums/1/photos"
+    private var page: Int
+
+    init(page: Int) {
+        self.page = page
+    }
+
+    private var path: String = "https://jsonplaceholder.typicode.com/albums"
 
     func getNetwork(completion: @escaping ((Result<[TypicodeStruct],Error>) -> Void)) {
 
-        if let url = URL(string: path) {
+        let urlStr = path + "/\(page)" + "/photos"
+
+        if let url = URL(string: urlStr) {
             URLSession.shared.dataTask(with: url) { data, respond, error in
                 if let data = data {
                     do {

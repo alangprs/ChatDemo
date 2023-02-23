@@ -9,18 +9,20 @@ import UIKit
 
 class HomeViewModel {
 
-    private lazy var getTypicodeDataUseCase: GetTypicodeDataUseCase = {
-        return GetTypicodeDataUseCase()
-    }()
-
     private(set) var typicodeList: [TypicodeStruct] = []
+
+    private var page: Int = 1
 
     func configure(indexPath: IndexPath) -> TypicodeStruct {
         return typicodeList[indexPath.row]
     }
 
+    func configurePage() {
+        page += 1
+    }
+
     func getNetworkItem(completion: @escaping ((Result<Void, Error>) -> Void)) {
-        getTypicodeDataUseCase.getNetwork {[weak self] result in
+        GetTypicodeDataUseCase(page: page).getNetwork {[weak self] result in
 
             switch result {
                 case .success(let typicodeItems):
@@ -49,7 +51,9 @@ class HomeViewModel {
     /// 翻轉取得資料
     private func reversedTypicodeList(typicodes: [TypicodeStruct]) {
         // TODO: - 如果有換頁，記得清空 array
-        
-        typicodeList += typicodes.reversed()
+
+        typicodeList += typicodes
+        // 加入新資料後，反轉
+        typicodeList.reverse()
     }
 }
