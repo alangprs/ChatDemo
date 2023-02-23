@@ -13,7 +13,6 @@ class HomeViewModel {
         return GetTypicodeDataUseCase()
     }()
 
-    /// api 拉回來原始資料
     private(set) var typicodeList: [TypicodeStruct] = []
 
     func configure(indexPath: IndexPath) -> TypicodeStruct {
@@ -24,8 +23,8 @@ class HomeViewModel {
         getTypicodeDataUseCase.getNetwork {[weak self] result in
 
             switch result {
-                case .success(let success):
-                    self?.typicodeList = success
+                case .success(let typicodeItems):
+                    self?.reversedTypicodeList(typicodes: typicodeItems)
                     completion(.success(Void()))
                 case .failure(let failure):
                     completion(.failure(failure))
@@ -45,5 +44,12 @@ class HomeViewModel {
                     completion(.failure(error))
             }
         }
+    }
+
+    /// 翻轉取得資料
+    private func reversedTypicodeList(typicodes: [TypicodeStruct]) {
+        // TODO: - 如果有換頁，記得清空 array
+        
+        typicodeList += typicodes.reversed()
     }
 }
