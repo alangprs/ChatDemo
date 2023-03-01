@@ -22,6 +22,8 @@ class HomeViewModel {
         return false
     }()
 
+    private var lastIndex = IndexPath()
+
     // MARK: - public func
 
     func configure(indexPath: IndexPath) -> TypicodeStruct {
@@ -35,21 +37,24 @@ class HomeViewModel {
         }
     }
 
-    func getNetworkItem(completion: @escaping ((Result<Void, Error>) -> Void)) {
+    func getNetworkItem(completion: @escaping ((Result<IndexPath, Error>) -> Void)) {
 
         if !isReFresh {
             isReFresh = true
             GetTypicodeDataUseCase(page: page).getNetwork {[weak self] result in
-                
+
+                guard let self = self else { return }
+
                 switch result {
                     case .success(let typicodeItems):
-                        self?.reversedTypicodeList(typicodes: typicodeItems)
-                        completion(.success(Void()))
+                        self.reversedTypicodeList(typicodes: typicodeItems)
+                        completion(.success(self.lastIndex))
+                        self.getCurrentID()
                     case .failure(let failure):
                         completion(.failure(failure))
                 }
                 
-                self?.isReFresh = false
+                self.isReFresh = false
             }
         }
     }
@@ -67,6 +72,24 @@ class HomeViewModel {
             }
         }
     }
+
+    /// 取得最後一個 ID
+    private func getCurrentID() {
+
+        guard !typicodeList.isEmpty,
+              let lastID = typicodeList.first?.id else {
+            Logger.errorLog(message: "vm lastIndex error")
+            return
+        }
+
+        if let lastIndexID = typicodeList.first(where: {$0.id == lastID}) {
+
+            lastIndex = IndexPath(row: lastIndexID.id, section: 0)
+            Logger.log(message: "vm \(lastIndex)")
+        }
+
+    }
+
 
     // MARK: - private func
 

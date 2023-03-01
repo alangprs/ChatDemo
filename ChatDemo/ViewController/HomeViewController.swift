@@ -89,14 +89,22 @@ class HomeViewController: UIViewController {
         displayTableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
     }
 
+    private func scrollToBottom(index: IndexPath) {
+        Logger.log(message: "vc index: \(index)")
+        DispatchQueue.main.async {
+            self.displayTableView.scrollToRow(at: index, at: .top, animated: true)
+        }
+    }
+
 
     @objc private func didReRefresh() {
         viewModel.configurePage()
 
         viewModel.getNetworkItem { result in
             switch result {
-                case .success(_):
+                case .success(let index):
                     self.endRefreshing()
+                    self.scrollToBottom(index: index)
                 case .failure(let error):
                     self.endRefreshing()
                     Logger.log(message: error)
