@@ -64,7 +64,7 @@ class HomeViewController: UIViewController {
                         self?.displayTableView.reloadData()
                     }
                 case .failure(let error):
-                    print("will - error: \(error)")
+                    Logger.log(message: error)
             }
         }
     }
@@ -85,7 +85,7 @@ class HomeViewController: UIViewController {
                     self.endRefreshing()
                 case .failure(let error):
                     self.endRefreshing()
-                    print("will - refresh error: \(error)")
+                    Logger.log(message: error)
             }
         }
     }
@@ -101,7 +101,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         guard let cell = displayTableView.dequeueReusableCell(withIdentifier: "\(HomeTableViewCell.self)", for: indexPath) as? HomeTableViewCell else {
-            print("will - get cell error")
+            Logger.log(message: "get cell error")
             return UITableViewCell()
         }
 
@@ -116,7 +116,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.iconImageView.image = image
                     }
                 case .failure(let error):
-                    print("will - downloadImage error: \(error)")
+                    Logger.log(message: "get cell error")
             }
         }
 
