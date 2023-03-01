@@ -9,27 +9,51 @@ import UIKit
 
 class HomeViewModel {
 
+    /// 未反轉資料
+    private var originaList: [TypicodeStruct] = []
+
+    /// 顯示用已反轉資料
     private(set) var typicodeList: [TypicodeStruct] = []
 
-    private var page: Int = 1
+    private var page: Int = 1 {
+        didSet {
+            Logger.log(message: page)
+        }
+    }
+
+    /// true = 抓資料中
+    private lazy var isReFresh: Bool = {
+        return false
+    }()
+
+    // MARK: - public func
 
     func configure(indexPath: IndexPath) -> TypicodeStruct {
         return typicodeList[indexPath.row]
     }
 
     func configurePage() {
-        page += 1
+
+        if !isReFresh {
+            page += 1
+        }
     }
 
     func getNetworkItem(completion: @escaping ((Result<Void, Error>) -> Void)) {
-        GetTypicodeDataUseCase(page: page).getNetwork {[weak self] result in
 
-            switch result {
-                case .success(let typicodeItems):
-                    self?.reversedTypicodeList(typicodes: typicodeItems)
-                    completion(.success(Void()))
-                case .failure(let failure):
-                    completion(.failure(failure))
+        if !isReFresh {
+            isReFresh = true
+            GetTypicodeDataUseCase(page: page).getNetwork {[weak self] result in
+                
+                switch result {
+                    case .success(let typicodeItems):
+                        self?.reversedTypicodeList(typicodes: typicodeItems)
+                        completion(.success(Void()))
+                    case .failure(let failure):
+                        completion(.failure(failure))
+                }
+                
+                self?.isReFresh = false
             }
         }
     }
@@ -48,11 +72,22 @@ class HomeViewModel {
         }
     }
 
+    // MARK: - private func
+
+    private func forroot(message: String) {
+        for i in typicodeList {
+            Logger.log(message: "\(message): \(i.id)")
+        }
+    }
+
     /// 翻轉取得資料
     private func reversedTypicodeList(typicodes: [TypicodeStruct]) {
         // TODO: - 如果有換頁，記得清空 array
 
-        typicodeList += typicodes
+        originaList += typicodes
+
+        typicodeList.removeAll()
+        typicodeList = originaList
         // 加入新資料後，反轉
         typicodeList.reverse()
     }

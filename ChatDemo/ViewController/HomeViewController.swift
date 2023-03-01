@@ -62,6 +62,7 @@ class HomeViewController: UIViewController {
                 case .success(_):
                     DispatchQueue.main.async { [weak self] in
                         self?.displayTableView.reloadData()
+                        self?.scrollPositionBottom()
                     }
                 case .failure(let error):
                     Logger.log(message: error)
@@ -75,6 +76,19 @@ class HomeViewController: UIViewController {
             self?.refreshControl.endRefreshing()
         }
     }
+
+    /// 滑動到最後一個 cell
+    private func scrollPositionBottom() {
+        let section = displayTableView.numberOfSections
+        guard section >= 1 else { return }
+
+        let row = displayTableView.numberOfRows(inSection: section - 1)
+        guard row >= 1 else { return }
+
+        let indexPath = IndexPath(row: row - 1, section: section - 1)
+        displayTableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
+    }
+
 
     @objc private func didReRefresh() {
         viewModel.configurePage()
@@ -116,7 +130,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.iconImageView.image = image
                     }
                 case .failure(let error):
-                    Logger.log(message: "get cell error")
+                    Logger.log(message: "get cell error: \(error)")
             }
         }
 
