@@ -15,14 +15,10 @@ class HomeViewModel {
     /// 顯示用已反轉資料
     private(set) var typicodeList: [TypicodeStruct] = []
 
-    private var page: Int = 1 {
-        didSet {
-            Logger.log(message: page)
-        }
-    }
+    private var page: Int = 1
 
     /// true = 抓資料中
-    private lazy var isReFresh: Bool = {
+    private(set) lazy var isReFresh: Bool = {
         return false
     }()
 
@@ -73,12 +69,6 @@ class HomeViewModel {
     }
 
     // MARK: - private func
-
-    private func forroot(message: String) {
-        for i in typicodeList {
-            Logger.log(message: "\(message): \(i.id)")
-        }
-    }
 
     /// 翻轉取得資料
     private func reversedTypicodeList(typicodes: [TypicodeStruct]) {
