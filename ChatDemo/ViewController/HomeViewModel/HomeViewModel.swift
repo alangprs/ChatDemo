@@ -22,7 +22,9 @@ class HomeViewModel {
         return false
     }()
 
-    private var lastIndex = IndexPath()
+    private var oldLastIndex: IndexPath?
+    private var newLastIndex: IndexPath?
+    private var oldLastCount = Int()
 
     // MARK: - public func
 
@@ -38,9 +40,9 @@ class HomeViewModel {
     }
 
     func getNetworkItem(completion: @escaping ((Result<IndexPath, Error>) -> Void)) {
-
         if !isReFresh {
             isReFresh = true
+            oldLastCount = typicodeList.count
             GetTypicodeDataUseCase(page: page).getNetwork {[weak self] result in
 
                 guard let self = self else { return }
@@ -48,8 +50,10 @@ class HomeViewModel {
                 switch result {
                     case .success(let typicodeItems):
                         self.reversedTypicodeList(typicodes: typicodeItems)
-                        completion(.success(self.lastIndex))
-                        self.getCurrentID()
+
+                        let scrollIndex = self.getCurrentID()
+                        completion(.success(scrollIndex))
+
                     case .failure(let failure):
                         completion(.failure(failure))
                 }
@@ -73,20 +77,29 @@ class HomeViewModel {
         }
     }
 
-    /// 取得最後一個 ID
-    private func getCurrentID() {
+    /// 判斷刷新資料後要滑動到的位置
+    /// - Returns: 回傳要滑動到的位置
+    private func getCurrentID() -> IndexPath {
 
+        self.oldLastIndex = self.newLastIndex
+        Logger.log(message: "下次要用的 index: \(self.oldLastIndex)")
+
+        // 取得新資料加入，反轉之後的最後一筆資料
         guard !typicodeList.isEmpty,
-              let lastID = typicodeList.first?.id else {
-            Logger.errorLog(message: "vm lastIndex error")
-            return
+              let lastItem = typicodeList.first?.id else {
+            return IndexPath()
         }
 
-        if let lastIndexID = typicodeList.first(where: {$0.id == lastID}) {
+        self.newLastIndex = IndexPath(row: lastItem - oldLastCount, section: 0)
 
-            lastIndex = IndexPath(row: lastIndexID.id, section: 0)
-            Logger.log(message: "vm \(lastIndex)")
+        guard let oldLastIndex = oldLastIndex else {
+            oldLastIndex = newLastIndex
+            Logger.log(message: "第一次刷新位置: \(oldLastIndex)")
+
+            return IndexPath()
         }
+
+        return oldLastIndex
 
     }
 

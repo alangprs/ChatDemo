@@ -90,7 +90,6 @@ class HomeViewController: UIViewController {
     }
 
     private func scrollToBottom(index: IndexPath) {
-        Logger.log(message: "vc index: \(index)")
         DispatchQueue.main.async {
             self.displayTableView.scrollToRow(at: index, at: .top, animated: true)
         }
