@@ -29,19 +29,23 @@ class DownloadImageUseCase {
                 completion(.success(image))
             } else {
 
-                downloadQueue.async {
-                    URLSession.shared.dataTask(with: url) { data, _, error in
-                        if let data = data {
+                // into background Q
+                URLSession.shared.dataTask(with: url) { data, _, error in
+                    // into background Q again
+                    if let data = data {
 
-                            let image = UIImage(data: data)
-                            try? data.write(to: imageFileUrl)
-                            completion(.success(image))
+                        let image = UIImage(data: data)
+                        try? data.write(to: imageFileUrl)
 
-                        } else {
-                            print("will - downloadImage error")
-                        }
-                    }.resume()
-                }
+                        // your closure is using background Q to pass data
+                        completion(.success(image))
+
+                    } else {
+                        guard let error = error else { return }
+                        completion(.failure(error))
+                    }
+                }.resume()
+
             }
         }
     }
