@@ -82,7 +82,7 @@ class HomeViewModel {
     private func getCurrentID() -> IndexPath {
 
         self.oldLastIndex = self.newLastIndex
-        Logger.log(message: "下次要用的 index: \(self.oldLastIndex)")
+        Logger.log(message: "下次要用的 index: \(String(describing: oldLastIndex))")
 
         // 取得新資料加入，反轉之後的最後一筆資料
         guard !typicodeList.isEmpty,
@@ -94,7 +94,7 @@ class HomeViewModel {
 
         guard let oldLastIndex = oldLastIndex else {
             oldLastIndex = newLastIndex
-            Logger.log(message: "第一次刷新位置: \(oldLastIndex)")
+            Logger.log(message: "第一次刷新位置: \(String(describing: oldLastIndex))")
 
             return IndexPath()
         }
@@ -108,7 +108,6 @@ class HomeViewModel {
 
     /// 翻轉取得資料
     private func reversedTypicodeList(typicodes: [TypicodeStruct]) {
-        // TODO: - 如果有換頁，記得清空 array
 
         originaList += typicodes
 
@@ -116,5 +115,8 @@ class HomeViewModel {
         typicodeList = originaList
         // 加入新資料後，反轉
         typicodeList.reverse()
+
+        // 如果安排順序是依照ID，可以考慮使用以下方式處理
+//        typicodeList = typicodeList.sorted { $0.id > $1.id }
     }
 }
