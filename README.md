@@ -15,4 +15,4 @@ MVVM + UseCase
 - 公開API: <https://jsonplaceholder.typicode.com/albums>
 
 ### 完成GIF
-![image] (demo/RPReplay_Final1677837735.GIF)
+![image] (https://github.com/alangprs/ChatDemo/blob/ae14f32d665566edfa05b9646182754c72103c37/demo/RPReplay_Final1677837735.GIF)
